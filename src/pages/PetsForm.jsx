@@ -1,7 +1,10 @@
 // File: src/pages/PetsForm.jsx
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useBooking } from "../context/BookingContext";
+import { sendEmail } from "../utils/email";
+import { buildEmailHtml } from "../utils/emailBuilder"; // import your builder here
 
 const PetsForm = () => {
   const navigate = useNavigate();
@@ -46,13 +49,47 @@ const PetsForm = () => {
   };
 
   const handleSubmit = () => {
-    // Validate required fields
     if (!form.email || !form.mobile) {
       alert("Email and mobile are required.");
       return;
     }
+
     setBookingData({ service: "Pets", ...form });
-    navigate("/review");
+
+    const htmlMessage = buildEmailHtml({
+      service: "Pets",
+      pet_name: form.petName || "N/A",
+      pet_type: form.petType || "N/A",
+      dog_breed: form.dogBreed || "N/A",
+      other_breed: form.otherBreed || "N/A",
+      pet_age: form.petAge || "N/A",
+      friendly_with_children: form.friendlyWithChildren || "N/A",
+      special_requirements: form.specialRequirements || "N/A",
+      special_requirements_details: form.specialRequirementsDetails || "N/A",
+      date: form.date || "N/A",
+      time: form.time || "N/A",
+      duration: form.duration || "N/A",
+      owner_first_name: form.ownerFirstName || "N/A",
+      owner_last_name: form.ownerLastName || "N/A",
+      email: form.email || "N/A",
+      mobile: form.mobile || "N/A",
+      additional_details: form.additionalDetails || "N/A",
+      name: `${form.ownerFirstName || "N/A"} ${form.ownerLastName || ""}`,
+      message: form.additionalDetails || "N/A",
+    });
+
+    sendEmail({
+      to_email: form.email,
+      html_message: htmlMessage,
+    })
+      .then((result) => {
+        console.log("Email sent!", result.text);
+        navigate("/review");
+      })
+      .catch((error) => {
+        console.error("EmailJS error:", error);
+        alert("Error sending email.");
+      });
   };
 
   return (
@@ -62,7 +99,6 @@ const PetsForm = () => {
           Reserve Pet Care Service
         </h2>
 
-        {/* Pet Details */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -148,7 +184,6 @@ const PetsForm = () => {
           )}
         </div>
 
-        {/* More Details */}
         <div className="mb-4">
           <p className="font-medium text-gray-700 mb-1">
             Is your pet friendly with children?
@@ -219,7 +254,6 @@ const PetsForm = () => {
           )}
         </div>
 
-        {/* Date and Owner Info */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -258,7 +292,6 @@ const PetsForm = () => {
               onChange={handleChange}
             />
           </div>
-
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Owner First Name
@@ -271,7 +304,6 @@ const PetsForm = () => {
               onChange={handleChange}
             />
           </div>
-
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Owner Last Name
@@ -284,7 +316,6 @@ const PetsForm = () => {
               onChange={handleChange}
             />
           </div>
-
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Email <span className="text-red-500">*</span>
@@ -299,7 +330,6 @@ const PetsForm = () => {
               required
             />
           </div>
-
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Mobile <span className="text-red-500">*</span>
