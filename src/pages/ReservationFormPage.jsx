@@ -4,6 +4,8 @@ import { useBooking } from "../context/BookingContext";
 import { useState } from "react";
 import BabysittingForm from "./BabySittingForm";
 import PetsForm from "./PetsForm";
+import HousekeepingForm from "./HouseKeepingForm";
+import ElderlyCompanionshipForm from "./ElderlyCompanionshipForm";
 
 const ReservationFormPage = () => {
   const { state } = useLocation();
@@ -21,6 +23,8 @@ const ReservationFormPage = () => {
     extraDetails: "",
   });
 
+  console.log("Rendering ReservationFormPage for:", form.service);
+
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
@@ -30,12 +34,18 @@ const ReservationFormPage = () => {
     navigate("/review");
   };
 
-  // ✅ Check if the selected service is Babysitting
+  // ✅ Redirect to custom forms if needed
   if (form.service === "Babysitting") {
     return <BabysittingForm />;
   }
   if (form.service === "Pets") {
     return <PetsForm />;
+  }
+  if (form.service === "Housekeeping") {
+    return <HousekeepingForm />;
+  }
+  if (form.service === "Elderly & Companionship") {
+    return <ElderlyCompanionshipForm />;
   }
 
   return (
@@ -112,10 +122,12 @@ const ReservationFormPage = () => {
             </label>
             <input
               name="email"
+              type="email"
               placeholder="Email Address"
               className="w-full border border-gray-300 p-3 rounded"
               value={form.email}
               onChange={handleChange}
+              required
             />
           </div>
         </div>
